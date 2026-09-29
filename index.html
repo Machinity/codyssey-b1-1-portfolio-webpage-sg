@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="정승규의 포트폴리오 - ROS 2와 CV를 공부하는 개발자">
+  <title>정승규 | Portfolio</title>
+
+  <!-- 웹 폰트: Ubuntu (Google Fonts, 허용됨) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono&display=swap">
+
+  <!-- 외부 스타일시트 / 스크립트 (defer: HTML을 다 읽은 뒤 실행) -->
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <!-- ===== Header & Navigation ===== -->
+  <header class="header" id="header">
+    <nav class="nav container" aria-label="주 메뉴">
+      <a href="#hero" class="nav-logo">seunggyu<span class="accent">@</span>portfolio</a>
+
+      <ul class="nav-menu" id="nav-menu">
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button type="button" class="icon-btn" id="theme-toggle" aria-label="다크 모드로 전환">🌙</button>
+        <button type="button" class="icon-btn nav-toggle" id="nav-toggle"
+                aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-menu">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===== Hero ===== -->
+    <section class="hero" id="hero">
+      <div class="container">
+        <p class="hero-prompt">seunggyu@ubuntu:~$ <span id="typing">ros2 run portfolio hello</span></p>
+        <h1 class="hero-title">안녕하세요,<br>개발자 <span class="accent">정승규</span>입니다.</h1>
+        <p class="hero-desc">ROS 2와 웹을 공부하며, 로봇과 사람을 잇는 소프트웨어를 만듭니다.</p>
+        <div class="hero-cta">
+          <a href="#projects" class="btn btn-primary">프로젝트 보기</a>
+          <a href="#contact" class="btn btn-outline">연락하기</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== About ===== -->
+    <section class="section" id="about">
+      <div class="container">
+        <h2 class="section-title reveal">About Me</h2>
+        <div class="about-content reveal">
+          <img src="images/profile.jpg" alt="정승규의 프로필 사진" class="about-img" width="240" height="240">
+          <div class="about-text">
+            <p>안녕하세요! Ubuntu 22.04와 ROS 2 Humble 환경에서 로봇 소프트웨어를 공부하고 있는 정승규입니다.</p>
+            <p>센서 데이터를 다루는 일에서 시작해, 지금은 그 결과를 사람이 쉽게 볼 수 있도록 웹으로 보여 주는 방법을 익히고 있습니다.</p>
+            <p>이 사이트는 라이브러리 없이 순수 HTML, CSS, JavaScript만으로 만들었습니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Skills ===== -->
+    <section class="section section-alt" id="skills">
+      <div class="container">
+        <h2 class="section-title reveal">Skills</h2>
+        <ul class="skill-list reveal">
+          <li class="tag">Git</li>
+          <li class="tag">Python</li>
+          <li class="tag">C++</li>
+          <li class="tag">ROS 2 Humble</li>
+          <li class="tag">Ubuntu 22.04</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== Projects (09단계에서 JS가 카드를 채움) ===== -->
+    <section class="section" id="projects">
+      <div class="container">
+        <h2 class="section-title reveal">Projects</h2>
+        <p class="section-desc">GitHub API로 불러온 저장소 목록입니다.</p>
+        <div id="projects-container" aria-live="polite">
+          <p class="status">로딩 중...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Contact ===== -->
+    <section class="section section-alt" id="contact">
+      <div class="container">
+        <h2 class="section-title reveal">Contact</h2>
+        <form class="contact-form reveal" id="contact-form" novalidate>
+          <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" autocomplete="name" aria-describedby="name-error">
+            <p class="error-message" id="name-error"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" autocomplete="email" aria-describedby="email-error">
+            <p class="error-message" id="email-error"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="message">메시지</label>
+            <textarea id="message" name="message" rows="5" aria-describedby="message-error"></textarea>
+            <p class="error-message" id="message-error"></p>
+          </div>
+
+          <button type="submit" class="btn btn-primary">보내기</button>
+          <p class="form-success" id="form-success" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>&copy; <span id="year">2026</span> 정승규. All rights reserved.</p>
+      <ul class="social-list">
+        <li><a href="https://github.com/Machinity" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/your-id" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="machinity@gmail.com">Email</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- 맨 위로 버튼 (05단계에서 동작) -->
+  <button type="button" class="scroll-top" id="scroll-top" aria-label="맨 위로 이동">↑</button>
+</body>
+</html>
