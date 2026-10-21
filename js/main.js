@@ -174,21 +174,38 @@ formFields.forEach((field) => {
   });
 });
 
-// [이벤트] 제출 시 전체 검사
-contactForm.addEventListener('submit', (event) => {
-  event.preventDefault(); // 페이지 새로고침(기본 제출) 막기
+const FORMSPREE_URL = 'https://formspree.io/f/abcdwxyz'; // ← 발급받은 주소
+
+// [이벤트] 제출 시 전체 검사 → 통과하면 Formspree로 전송
+contactForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
 
   formFields.forEach(({ name, value }) => setFieldError(name, value));
 
   const invalidNames = Object.keys(formErrors).filter((name) => formErrors[name]);
   if (invalidNames.length > 0) {
-    contactForm.querySelector(`#${invalidNames[0]}`).focus(); // 첫 번째 에러 칸으로 이동
+    contactForm.querySelector(`#${invalidNames[0]}`).focus();
     return;
   }
 
   const name = contactForm.querySelector('#name').value.trim();
-  formSuccess.textContent = `${name}님, 메시지가 전송되었습니다. 감사합니다!`; // 사용자 입력 → textContent
-  contactForm.reset();
+  formSuccess.classList.remove('is-error');
+  formSuccess.textContent = '전송 중...';
+
+  try {
+    const response = await fetch(FORMSPREE_URL, {
+      method: 'POST',
+      body: new FormData(contactForm), // name 속성(name, email, message)을 키로 전송
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) throw new Error(`전송 실패 (상태 코드 ${response.status})`);
+
+    formSuccess.textContent = `${name}님, 메시지가 전송되었습니다. 감사합니다!`;
+    contactForm.reset();
+  } catch (error) {
+    formSuccess.classList.add('is-error');
+    formSuccess.textContent = `메시지를 보내지 못했습니다. 잠시 후 다시 시도해 주세요. (${error.message})`;
+  }
 });
 
 // ---------- 8. GitHub 프로젝트 (API 호출 → 로딩/성공/에러 상태 → Projects 렌더링) ----------
@@ -197,7 +214,7 @@ const API_URL = `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=upda
 const projectsContainer = document.querySelector('#projects-container');
 
 // [상태] status: 'loading' | 'success' | 'error'
-const projectState = { status: 'loading', repos: [], errorMessage: '' };
+const projectState = { status: 'loading', repos: [], errorMessage: '', filter: 'all' };
 
 // 외부 데이터를 innerHTML에 넣기 전, HTML 특수문자를 글자로 바꾼다.
 const escapeHTML = (text) =>
@@ -223,9 +240,15 @@ const createProjectCard = ({ name, description, html_url, language, stargazers_c
   </article>
 `;
 
+// 저장소 목록에서 언어 목록 만들기: ['all', 'JavaScript', 'Python', ...]
+const getLanguages = (repos) => [
+  'all',
+  ...new Set(repos.map(({ language }) => language).filter(Boolean)),
+];
+
 // [렌더링] 상태에 따라 네 가지 화면 중 하나를 그린다.
 const renderProjects = () => {
-  const { status, repos, errorMessage } = projectState;
+  const { status, repos, errorMessage, filter } = projectState;
 
   if (status === 'loading') {
     projectsContainer.innerHTML = `
@@ -254,12 +277,34 @@ const renderProjects = () => {
     return;
   }
 
+  // 필터 상태에 맞는 저장소만 고른다.
+  const visibleRepos = filter === 'all'
+    ? repos
+    : repos.filter(({ language }) => language === filter);
+
+  const filterButtons = getLanguages(repos)
+    .map((lang) => `
+      <button type="button" class="filter-btn ${lang === filter ? 'active' : ''}"
+              data-lang="${escapeHTML(lang)}" aria-pressed="${lang === filter}">
+        ${lang === 'all' ? '전체' : escapeHTML(lang)}
+      </button>
+    `)
+    .join('');
+
   projectsContainer.innerHTML = `
+    <div class="filter-bar">${filterButtons}</div>
     <div class="project-grid">
-      ${repos.map(createProjectCard).join('')}
+      ${visibleRepos.map(createProjectCard).join('')}
     </div>
   `;
-  // 새로 만든 카드들도 스크롤 애니메이션 대상으로 등록 (07단계의 observer 재사용)
+
+  // [이벤트] 필터 버튼 클릭 → 필터 상태 변경 → 다시 렌더링
+  projectsContainer.querySelectorAll('.filter-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      setProjectState({ filter: button.dataset.lang });
+    });
+  });
+
   projectsContainer.querySelectorAll('.reveal').forEach((card) => revealObserver.observe(card));
 };
 
@@ -293,3 +338,20 @@ const loadProjects = async () => {
 };
 
 loadProjects();
+
+// ---------- 보너스 2. Hero 타이핑 효과 ----------
+const typingEl = document.querySelector('#typing');
+const TYPING_TEXT = typingEl.textContent; // HTML에 적힌 원래 문구
+const TYPING_SPEED = 90; // 한 글자당 ms
+let typedLength = 0;
+
+const typeNextChar = () => {
+  typedLength += 1;
+  typingEl.textContent = TYPING_TEXT.slice(0, typedLength);
+  if (typedLength < TYPING_TEXT.length) {
+    setTimeout(typeNextChar, TYPING_SPEED);
+  }
+};
+
+typingEl.textContent = '';
+setTimeout(typeNextChar, 600); // 페이지가 뜬 뒤 잠깐 쉬었다가 시작
